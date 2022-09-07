@@ -1,6 +1,6 @@
 class VoucherPrinter():
 
-    def print_vouchers(self, vouchers):
+    def print_vouchers(self, vouchers, output_file):
         # use the line_items and voucher objects
         if output_file:
             columns = int(headers.get('columns'))
@@ -63,13 +63,17 @@ class VoucherPrinter():
         voucher_data = [data.rstrip('\r\n') for data in voucher_data]
         return dict(zip(headers, voucher_data))
 
-    def validate(self, vouchers, voucher_values):
+    def validate(self, vouchers, voucher_values, file_input_path):
 
-        if(vouchers == int(voucher_values)):
+        if(int(len(vouchers)) == int(voucher_values)):
             print('\nFile successfully passed file validation, summary matches vouchers\n')
-            self.print_vouchers(vouchers)
+            last_stop = file_input_path.rfind(".")
+            output_file = file_input_path[:last_stop] + '_result.txt'
+            output_file = open(output_file, 'w')
+            self.print_vouchers(vouchers, output_file)
         else:
             raise Exception('\nValidation Error: File failed validation, vouchers did not match summary.\n')
+            
 
     def main(self, file_input_path):
         input_file = open(file_input_path, 'r')
@@ -105,29 +109,19 @@ class VoucherPrinter():
             line = input_file.readline().rstrip('\r\n')
         if input_file:
             input_file.close()
-        int_len_vouchers = int(len(vouchers))
-        self.validate(int_len_vouchers, voucher_values)
+        self.validate(vouchers, voucher_values, file_input_path)
         
 
 
 if __name__ == '__main__':
     try:
         file_input_path = input("Please enter file path: ")
-    except:
-        print('Invalid Path Entered')
-
-    last_stop = file_input_path.rfind(".")
-    output_file = file_input_path[:last_stop] + '_result.txt'
+    except: raise Exception('Invalid Path Entered')
 
     headers = {}
     vouchers = [] 
     line_items = []
     voucher_summaries = {}  
     voucher_averages = {}  
-    
-    output_file = open(output_file, 'w')
-
     voucher_print = VoucherPrinter()
     voucher_print.main(file_input_path)
-
-  
